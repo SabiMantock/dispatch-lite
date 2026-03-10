@@ -10,7 +10,11 @@ export enum JobStatus {
   Cancelled = "cancelled",
 }
 
-export type JobPriority = "low" | "medium" | "high"
+export enum JobPriority {
+  Low = "low",
+  Medium = "medium",
+  High = "high",
+}
 
 export interface JobLifecycleTimestamps {
   created_at: string
