@@ -31,7 +31,7 @@ export interface Job {
   customer_phone: string
   pickup_address: Address
   dropoff_address: Address
-  parcel_type: string
+  parcelType: string
   priority: JobPriority
   status: JobStatus
   scheduled_pickup_time: string
