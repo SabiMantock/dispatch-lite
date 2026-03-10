@@ -36,5 +36,5 @@ export interface Job {
   status: JobStatus
   scheduled_pickup_time: string
   lifecycle_timestamps: JobLifecycle
-  driver_id?: string
+  driverId?: string
 }
