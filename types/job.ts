@@ -34,7 +34,7 @@ export interface Job {
   parcelType: string
   priority: JobPriority
   status: JobStatus
-  scheduled_pickup_time: string
+  scheduledPickupAt: string
   lifecycle_timestamps: JobLifecycle
   driverId?: string
 }
