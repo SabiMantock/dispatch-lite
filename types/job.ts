@@ -16,14 +16,13 @@ export enum JobPriority {
   High = "high",
 }
 
-export interface JobLifecycleTimestamps {
-  created_at: string
-  assigned_at?: string
-  picked_up_at?: string
-  in_transit_at?: string
-  delivered_at?: string
-  failed_at?: string
-  cancelled_at?: string
+export interface JobLifecycle {
+  assignedAt?: string
+  pickedUpAt?: string
+  inTransitAt?: string
+  deliveredAt?: string
+  failedAt?: string
+  cancelledAt?: string
 }
 
 export interface Job {
@@ -35,6 +34,6 @@ export interface Job {
   priority: JobPriority
   status: JobStatus
   scheduled_pickup_time: string
-  lifecycle_timestamps: JobLifecycleTimestamps
+  lifecycle_timestamps: JobLifecycle
   driver_id?: string
 }
