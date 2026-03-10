@@ -26,6 +26,7 @@ export interface JobLifecycle {
 }
 
 export interface Job {
+  id: string
   customer_name: string
   customer_phone: string
   pickup_address: Address
