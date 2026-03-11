@@ -25,10 +25,15 @@ export interface JobLifecycle {
   cancelledAt?: string
 }
 
+export interface Customer {
+  name: string
+  phone: string
+}
+
 export interface Job {
   id: string
-  customer_name: string
-  customer_phone: string
+  customer_name: Customer["name"]
+  customer_phone: Customer["phone"]
   pickup_address: Address
   dropoff_address: Address
   parcelType: string
