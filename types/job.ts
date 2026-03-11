@@ -1,14 +1,5 @@
 import type { Address } from "./address"
-
-export enum JobStatus {
-  Pending = "pending",
-  Assigned = "assigned",
-  PickedUp = "picked_up",
-  InTransit = "in_transit",
-  Delivered = "delivered",
-  Failed = "failed",
-  Cancelled = "cancelled",
-}
+import { JobStatus } from "./jobStatus"
 
 export enum JobPriority {
   Low = "low",
