@@ -1,9 +1,9 @@
 export interface Address {
-  line_1: string
-  line_2?: string
+  line1: string
+  line2?: string
   city: string
   state: string
-  postal_code: string
+  postalCode: string
   country: string
   lat: number
   lng: number
