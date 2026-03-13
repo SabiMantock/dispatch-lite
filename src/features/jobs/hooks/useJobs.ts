@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
-import type { Job } from "../../../types/job"
-import { JobStatus } from "../../../types/jobStatus"
+import type { Job } from "../../../../types/job"
+import { JobStatus } from "../../../../types/jobStatus"
 import type {
   CreateJobInput,
   JobsService,

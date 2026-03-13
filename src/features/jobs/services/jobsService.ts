@@ -1,5 +1,5 @@
-import type { Job } from "../../../types/job"
-import { JobStatus } from "../../../types/jobStatus"
+import type { Job } from "../../../../types/job"
+import { JobStatus } from "../../../../types/jobStatus"
 
 export interface JobsApi {
   list(): Promise<Job[]>

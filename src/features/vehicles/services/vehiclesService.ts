@@ -1,5 +1,5 @@
-import type { Vehicle } from "../../../types/vehicle"
-import { VehicleStatus } from "../../../types/vehicleStatus"
+import type { Vehicle } from "../../../../types/vehicle"
+import { VehicleStatus } from "../../../../types/vehicleStatus"
 
 export interface VehiclesApi {
   list(): Promise<Vehicle[]>

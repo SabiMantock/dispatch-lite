@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
-import type { Vehicle } from "../../../types/vehicle"
-import { VehicleStatus } from "../../../types/vehicleStatus"
+import type { Vehicle } from "../../../../types/vehicle"
+import { VehicleStatus } from "../../../../types/vehicleStatus"
 import type {
   CreateVehicleInput,
   VehiclesService,

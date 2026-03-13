@@ -1,13 +1,7 @@
-
-import './App.css'
+import { AppRouter } from './app/router'
 
 function App() {
-
-  return (
-    <>
-      <h1 className=' bg-red-400'>Dispatch Lite</h1>
-    </>
-  )
+  return <AppRouter />
 }
 
 export default App

@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
-import type { Driver } from "../../../types/driver"
-import { DriverStatus } from "../../../types/driverStatus"
+import type { Driver } from "../../../../types/driver"
+import { DriverStatus } from "../../../../types/driverStatus"
 import type {
   CreateDriverInput,
   DriversService,

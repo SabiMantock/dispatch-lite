@@ -1,5 +1,5 @@
-import type { Driver } from "../../../types/driver"
-import { DriverStatus } from "../../../types/driverStatus"
+import type { Driver } from "../../../../types/driver"
+import { DriverStatus } from "../../../../types/driverStatus"
 
 export interface DriversApi {
   list(): Promise<Driver[]>
