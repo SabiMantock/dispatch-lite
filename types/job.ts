@@ -1,40 +1,18 @@
 import type { Address } from "./address"
-
-export enum JobStatus {
-  Pending = "pending",
-  Assigned = "assigned",
-  PickedUp = "picked_up",
-  InTransit = "in_transit",
-  Delivered = "delivered",
-  Failed = "failed",
-  Cancelled = "cancelled",
-}
-
-export enum JobPriority {
-  Low = "low",
-  Medium = "medium",
-  High = "high",
-}
-
-export interface JobLifecycleTimestamps {
-  created_at: string
-  assigned_at?: string
-  picked_up_at?: string
-  in_transit_at?: string
-  delivered_at?: string
-  failed_at?: string
-  cancelled_at?: string
-}
+import type { Customer } from "./customer"
+import type { JobLifecycle } from "./jobLifecycle"
+import { JobPriority } from "./jobPriority"
+import { JobStatus } from "./jobStatus"
 
 export interface Job {
-  customer_name: string
-  customer_phone: string
-  pickup_address: Address
-  dropoff_address: Address
-  parcel_type: string
+  id: string
+  customer: Customer
+  pickupAddress: Address
+  dropoffAddress: Address
+  parcelType: string
   priority: JobPriority
   status: JobStatus
-  scheduled_pickup_time: string
-  lifecycle_timestamps: JobLifecycleTimestamps
-  driver_id?: string
+  scheduledPickupAt: string
+  lifecycle: JobLifecycle
+  driverId?: string
 }
