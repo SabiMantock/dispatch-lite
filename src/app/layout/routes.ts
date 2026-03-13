@@ -8,16 +8,9 @@ export type RouteDefinition = {
 
 export const routes: RouteDefinition[] = [
   {
-    path: '/dashboard',
-    label: 'Dashboard',
-    description: 'Overview of live dispatch operations.',
-    title: 'Dispatch Dashboard',
-    subtitle: 'Monitor active operations and route work across the fleet.',
-  },
-  {
     path: '/jobs',
     label: 'Jobs',
-    description: 'Track delivery tasks and priorities.',
+    description: 'Track delivery tasks and dispatch priorities.',
     title: 'Jobs Workspace',
     subtitle: 'Review incoming jobs, queue status, and dispatch readiness.',
   },

@@ -51,11 +51,6 @@ type WorkspaceRow = {
 }
 
 const routeRows: Record<string, WorkspaceRow[]> = {
-  '/dashboard': [
-    { item: 'Morning dispatch board', owner: 'Control', status: 'Live', priority: 'High' },
-    { item: 'Exception review queue', owner: 'Ops Lead', status: 'Pending', priority: 'Medium' },
-    { item: 'Fleet coverage audit', owner: 'Fleet Desk', status: 'Ready', priority: 'Low' },
-  ],
   '/jobs': [
     { item: 'J-1042 pickup window', owner: 'Priya', status: 'Assigned', priority: 'High' },
     { item: 'J-1048 address check', owner: 'Mason', status: 'Pending', priority: 'Medium' },
@@ -77,7 +72,7 @@ export function DashboardLayout({ route }: DashboardLayoutProps) {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
   const [isInspectorOpen, setIsInspectorOpen] = useState(true)
   const columnHelper = createColumnHelper<WorkspaceRow>()
-  const data = routeRows[route.path] ?? routeRows['/dashboard']
+  const data = routeRows[route.path] ?? routeRows['/jobs']
   const columns = useMemo(
     () => [
       columnHelper.accessor('item', {

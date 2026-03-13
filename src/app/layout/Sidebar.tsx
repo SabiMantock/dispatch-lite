@@ -48,7 +48,7 @@ export function Sidebar({
               Operations Console
             </h1>
             <p className="mt-2 max-w-[15rem] text-sm leading-6 text-slate-400">
-              Dispatch dashboard for routing jobs, drivers, and vehicles.
+              Operational shell for routing jobs, drivers, and vehicles.
             </p>
           </>
         ) : null}

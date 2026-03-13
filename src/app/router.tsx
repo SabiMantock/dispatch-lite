@@ -23,7 +23,7 @@ export function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/" element={<Navigate to="/jobs" replace />} />
         {routes.map((route) => (
           <Route
             key={route.path}
@@ -31,7 +31,7 @@ export function AppRouter() {
             element={<RoutedDashboardLayout />}
           />
         ))}
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        <Route path="*" element={<Navigate to="/jobs" replace />} />
       </Routes>
     </BrowserRouter>
   )

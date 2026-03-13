@@ -14,14 +14,14 @@ export function WorkspaceOverview({ cards }: WorkspaceOverviewProps) {
       <div className="flex items-start justify-between">
         <div>
           <p className="text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-slate-500">
-            Dispatch Surface
+            Operations Workspace
           </p>
           <h3 className="mt-3 text-2xl font-semibold text-slate-50">
-            Welcome back, dispatcher
+            Main operations shell
           </h3>
           <p className="mt-2 max-w-xl text-sm leading-6 text-slate-400">
-            Your console is calibrated. The shell keeps jobs, drivers,
-            vehicles, and operational review visible in one pass.
+            The shell keeps jobs, drivers, vehicles, filters, and inspection
+            tools visible across operational pages.
           </p>
         </div>
         <div className="rounded-2xl border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-xs font-medium text-cyan-300">

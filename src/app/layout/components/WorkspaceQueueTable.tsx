@@ -74,11 +74,11 @@ export function WorkspaceQueueTable({
           Workspace Notes
         </p>
         <h4 className="mt-3 text-xl font-semibold text-slate-50">
-          Workspace prepared for {routeLabel.toLowerCase()} workflows
+          Shell prepared for {routeLabel.toLowerCase()} workflows
         </h4>
         <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-400">
-          This keeps the shell content intact while shifting the dashboard into
-          a denser overview layout inspired by the reference wireframe.
+          This keeps the application shell reusable across the jobs, drivers,
+          and vehicles pages while preserving the current operational layout.
         </p>
       </article>
     </LayoutPanel>
