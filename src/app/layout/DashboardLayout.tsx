@@ -1,41 +1,35 @@
 import {
-  createColumnHelper,
-  getCoreRowModel,
-  useReactTable,
-} from '@tanstack/react-table'
-import { useMemo, useState } from 'react'
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 
 import { DailySummaryPanel } from './components/DailySummaryPanel'
 import { FilterPanel } from './components/FilterPanel'
 import { InspectorPanel } from './components/InspectorPanel'
 import { WorkspaceOverview } from './components/WorkspaceOverview'
-import { WorkspaceQueueTable } from './components/WorkspaceQueueTable'
 import { Sidebar } from './Sidebar'
 import { Topbar } from './Topbar'
 import type { RouteDefinition } from './routes'
 import { routes } from './routes'
+import { DriverInspector } from '../../features/drivers/components/DriverInspector'
+import { DriverTable } from '../../features/drivers/components/DriverTable'
+import { useDrivers } from '../../features/drivers/hooks/useDrivers'
+import { driversService } from '../../features/drivers/services/driversServiceInstance'
+import { JobFilters } from '../../features/jobs/components/JobFilters'
+import { JobInspector } from '../../features/jobs/components/JobInspector'
+import { JobTable } from '../../features/jobs/components/JobTable'
+import { useJobs } from '../../features/jobs/hooks/useJobs'
+import { jobsService } from '../../features/jobs/services/jobsServiceInstance'
+import { VehicleInspector } from '../../features/vehicles/components/VehicleInspector'
+import { VehicleTable } from '../../features/vehicles/components/VehicleTable'
+import { useVehicles } from '../../features/vehicles/hooks/useVehicles'
+import { vehiclesService } from '../../features/vehicles/services/vehiclesServiceInstance'
+import { useUIStore } from '../../stores/uiStore'
 
 type DashboardLayoutProps = {
   route: RouteDefinition
 }
-
-const workspaceCards = [
-  {
-    label: 'Active Queue',
-    value: '24',
-    detail: 'Jobs awaiting assignment and dispatch review.',
-  },
-  {
-    label: 'Driver Readiness',
-    value: '18',
-    detail: 'Available drivers ready to receive work.',
-  },
-  {
-    label: 'Fleet Visibility',
-    value: '09',
-    detail: 'Vehicles tracked in the live operations pool.',
-  },
-]
 
 const donutSegments = [
   { label: 'Focus on work', value: '51%', color: '#fb923c' },
@@ -43,64 +37,104 @@ const donutSegments = [
   { label: 'Breaks', value: '20%', color: '#22d3ee' },
 ]
 
-type WorkspaceRow = {
-  item: string
-  owner: string
-  status: string
-  priority: string
-}
-
-const routeRows: Record<string, WorkspaceRow[]> = {
-  '/jobs': [
-    { item: 'J-1042 pickup window', owner: 'Priya', status: 'Assigned', priority: 'High' },
-    { item: 'J-1048 address check', owner: 'Mason', status: 'Pending', priority: 'Medium' },
-    { item: 'J-1051 customer callback', owner: 'Ava', status: 'Escalated', priority: 'High' },
-  ],
-  '/drivers': [
-    { item: 'Driver readiness sweep', owner: 'Dispatch', status: 'Live', priority: 'Medium' },
-    { item: 'Offline status review', owner: 'Support', status: 'Pending', priority: 'Low' },
-    { item: 'Coverage gap handoff', owner: 'Control', status: 'Action', priority: 'High' },
-  ],
-  '/vehicles': [
-    { item: 'Van 12 availability', owner: 'Fleet Desk', status: 'Ready', priority: 'Medium' },
-    { item: 'Truck 04 maintenance', owner: 'Workshop', status: 'Blocked', priority: 'High' },
-    { item: 'Bike 07 battery swap', owner: 'Support', status: 'Queued', priority: 'Low' },
-  ],
-}
-
 export function DashboardLayout({ route }: DashboardLayoutProps) {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
-  const [isInspectorOpen, setIsInspectorOpen] = useState(true)
-  const columnHelper = createColumnHelper<WorkspaceRow>()
-  const data = routeRows[route.path] ?? routeRows['/jobs']
-  const columns = useMemo(
-    () => [
-      columnHelper.accessor('item', {
-        header: 'Item',
-        cell: (info) => info.getValue(),
-      }),
-      columnHelper.accessor('owner', {
-        header: 'Owner',
-        cell: (info) => info.getValue(),
-      }),
-      columnHelper.accessor('status', {
-        header: 'Status',
-        cell: (info) => info.getValue(),
-      }),
-      columnHelper.accessor('priority', {
-        header: 'Priority',
-        cell: (info) => info.getValue(),
-      }),
-    ],
-    [columnHelper],
-  )
-  // TanStack Table manages its own internal memoization model.
-  // eslint-disable-next-line react-hooks/incompatible-library
-  const table = useReactTable({
-    data,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-  })
+  const activeWorkspace = useUIStore((state) => state.activeWorkspace)
+  const isInspectorOpen = useUIStore((state) => state.isInspectorOpen)
+  const openInspectorForEntity = useUIStore((state) => state.openInspectorForEntity)
+  const selectedEntityId = useUIStore((state) => state.selectedEntityId)
+  const setActiveWorkspace = useUIStore((state) => state.setActiveWorkspace)
+  const setInspectorOpen = useUIStore((state) => state.setInspectorOpen)
+  const setSelectedEntityId = useUIStore((state) => state.setSelectedEntityId)
+
+  const jobsQuery = useJobs(jobsService)
+  const driversQuery = useDrivers(driversService)
+  const vehiclesQuery = useVehicles(vehiclesService)
+
+  useEffect(() => {
+    const workspace = route.path.replace("/", "") as "jobs" | "drivers" | "vehicles"
+    setActiveWorkspace(workspace)
+    setSelectedEntityId(null)
+  }, [route.path, setActiveWorkspace, setSelectedEntityId])
+
+  const selectedJob =
+    jobsQuery.jobs.find((job) => job.id === selectedEntityId) ?? null
+  const selectedDriver =
+    driversQuery.drivers.find((driver) => driver.id === selectedEntityId) ?? null
+  const selectedVehicle =
+    vehiclesQuery.vehicles.find((vehicle) => vehicle.id === selectedEntityId) ?? null
+
+  const workspaceCards = useMemo(() => {
+    if (activeWorkspace === "drivers") {
+      return [
+        {
+          label: "Active Drivers",
+          value: String(driversQuery.drivers.length).padStart(2, "0"),
+          detail: "Drivers available across the current operational shift.",
+        },
+        {
+          label: "Busy Coverage",
+          value: String(
+            driversQuery.drivers.filter((driver) => driver.status === "busy").length,
+          ).padStart(2, "0"),
+          detail: "Drivers actively handling assignments right now.",
+        },
+        {
+          label: "Offline",
+          value: String(
+            driversQuery.drivers.filter((driver) => driver.status === "offline").length,
+          ).padStart(2, "0"),
+          detail: "Drivers currently unavailable for dispatch handoff.",
+        },
+      ]
+    }
+
+    if (activeWorkspace === "vehicles") {
+      return [
+        {
+          label: "Fleet Visible",
+          value: String(vehiclesQuery.vehicles.length).padStart(2, "0"),
+          detail: "Vehicles visible to the dispatch console.",
+        },
+        {
+          label: "Assigned Fleet",
+          value: String(
+            vehiclesQuery.vehicles.filter((vehicle) => vehicle.status === "assigned").length,
+          ).padStart(2, "0"),
+          detail: "Fleet units currently covering active work.",
+        },
+        {
+          label: "Maintenance",
+          value: String(
+            vehiclesQuery.vehicles.filter((vehicle) => vehicle.status === "maintenance").length,
+          ).padStart(2, "0"),
+          detail: "Vehicles blocked for maintenance-sensitive checks.",
+        },
+      ]
+    }
+
+    return [
+      {
+        label: 'Active Queue',
+        value: String(jobsQuery.jobs.length).padStart(2, "0"),
+        detail: 'Jobs awaiting assignment and dispatch review.',
+      },
+      {
+        label: 'Assigned Jobs',
+        value: String(
+          jobsQuery.jobs.filter((job) => job.status === "assigned").length,
+        ).padStart(2, "0"),
+        detail: 'Jobs currently allocated to active drivers.',
+      },
+      {
+        label: 'High Priority',
+        value: String(
+          jobsQuery.jobs.filter((job) => job.priority === "high").length,
+        ).padStart(2, "0"),
+        detail: 'Priority jobs requiring immediate dispatcher attention.',
+      },
+    ]
+  }, [activeWorkspace, driversQuery.drivers, jobsQuery.jobs, vehiclesQuery.vehicles])
 
   return (
     <div className="min-h-screen bg-[#020617] text-slate-100">
@@ -123,7 +157,7 @@ export function DashboardLayout({ route }: DashboardLayoutProps) {
             subtitle={route.subtitle}
             isInspectorOpen={isInspectorOpen}
             notificationCount={3}
-            onToggleInspector={() => setIsInspectorOpen((value) => !value)}
+            onToggleInspector={() => setInspectorOpen(!isInspectorOpen)}
           />
 
           <main
@@ -140,16 +174,74 @@ export function DashboardLayout({ route }: DashboardLayoutProps) {
               </div>
 
               <div className="grid gap-4 lg:grid-cols-[300px_minmax(0,1fr)]">
-                <FilterPanel />
-                <WorkspaceQueueTable
-                  rowCount={data.length}
-                  routeLabel={route.label}
-                  table={table}
-                />
+                {activeWorkspace === "jobs" ? (
+                  <JobFilters />
+                ) : (
+                  <FilterPanel
+                    eyebrow={`${route.label} Filters`}
+                    title={route.label}
+                    note={`Filter controls for the ${route.label.toLowerCase()} workspace are prepared for route-specific workflows.`}
+                  >
+                    <label className="block">
+                      <span className="text-xs uppercase tracking-[0.2em] text-slate-500">
+                        Operational State
+                      </span>
+                      <select className="dashboard-select mt-2 w-full rounded-2xl border border-white/8 px-4 py-3 pr-10 text-sm text-slate-100 outline-none">
+                        <option>All states</option>
+                        <option>Available</option>
+                        <option>Assigned</option>
+                        <option>Offline</option>
+                      </select>
+                    </label>
+                    <label className="block">
+                      <span className="text-xs uppercase tracking-[0.2em] text-slate-500">
+                        Coverage
+                      </span>
+                      <select className="dashboard-select mt-2 w-full rounded-2xl border border-white/8 px-4 py-3 pr-10 text-sm text-slate-100 outline-none">
+                        <option>Current shift</option>
+                        <option>Assigned only</option>
+                        <option>Needs attention</option>
+                      </select>
+                    </label>
+                  </FilterPanel>
+                )}
+
+                {activeWorkspace === "jobs" ? (
+                  <JobTable
+                    jobs={jobsQuery.jobs}
+                    selectedJobId={selectedEntityId}
+                    onSelectJob={openInspectorForEntity}
+                  />
+                ) : null}
+                {activeWorkspace === "drivers" ? (
+                  <DriverTable
+                    drivers={driversQuery.drivers}
+                    selectedDriverId={selectedEntityId}
+                    onSelectDriver={openInspectorForEntity}
+                  />
+                ) : null}
+                {activeWorkspace === "vehicles" ? (
+                  <VehicleTable
+                    vehicles={vehiclesQuery.vehicles}
+                    selectedVehicleId={selectedEntityId}
+                    onSelectVehicle={openInspectorForEntity}
+                  />
+                ) : null}
               </div>
             </section>
 
-            <InspectorPanel route={route} isOpen={isInspectorOpen} />
+            <InspectorPanel
+              title={`${route.label} Inspector`}
+              isOpen={isInspectorOpen}
+            >
+              {activeWorkspace === "jobs" ? <JobInspector job={selectedJob} /> : null}
+              {activeWorkspace === "drivers" ? (
+                <DriverInspector driver={selectedDriver} />
+              ) : null}
+              {activeWorkspace === "vehicles" ? (
+                <VehicleInspector vehicle={selectedVehicle} />
+              ) : null}
+            </InspectorPanel>
           </main>
         </div>
       </div>

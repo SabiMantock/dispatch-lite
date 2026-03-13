@@ -9,6 +9,7 @@ type UIState = {
   setActiveWorkspace: (workspace: ActiveWorkspace) => void
   setInspectorOpen: (isOpen: boolean) => void
   setSelectedEntityId: (entityId: string | null) => void
+  openInspectorForEntity: (entityId: string) => void
 }
 
 export const useUIStore = create<UIState>((set) => ({
@@ -18,4 +19,6 @@ export const useUIStore = create<UIState>((set) => ({
   setActiveWorkspace: (activeWorkspace) => set({ activeWorkspace }),
   setInspectorOpen: (isInspectorOpen) => set({ isInspectorOpen }),
   setSelectedEntityId: (selectedEntityId) => set({ selectedEntityId }),
+  openInspectorForEntity: (selectedEntityId) =>
+    set({ isInspectorOpen: true, selectedEntityId }),
 }))
