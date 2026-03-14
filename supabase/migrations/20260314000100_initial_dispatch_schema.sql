@@ -1,58 +1,91 @@
-create extension if not exists pgcrypto;
+-- Enable PostGIS for spatial data
+create extension if not exists postgis;
 
-create table if not exists vehicles (
-  id uuid primary key default gen_random_uuid(),
-  plate_number text not null,
-  type text not null,
-  capacity integer not null,
-  status text not null,
-  created_at timestamp with time zone not null default now()
+-- ENUM TYPES
+
+create type job_status as enum (
+  'pending',
+  'assigned',
+  'in_transit',
+  'delivered',
+  'failed',
+  'cancelled'
 );
 
-create table if not exists drivers (
+create type job_priority as enum (
+  'low',
+  'medium',
+  'high'
+);
+
+create type driver_status as enum (
+  'available',
+  'assigned',
+  'on_route',
+  'offline'
+);
+
+create type vehicle_status as enum (
+  'available',
+  'assigned',
+  'maintenance',
+  'offline'
+);
+
+-- VEHICLES TABLE
+
+create table vehicles (
   id uuid primary key default gen_random_uuid(),
-  name text not null,
-  phone text not null,
-  status text not null,
+  plate_number text unique,
+  type text,
+  capacity integer,
+  status vehicle_status,
+  created_at timestamp default now()
+);
+
+-- DRIVERS TABLE
+
+create table drivers (
+  id uuid primary key default gen_random_uuid(),
+  name text,
+  phone text,
+  status driver_status,
   vehicle_id uuid references vehicles(id),
-  created_at timestamp with time zone not null default now()
+  location geography(Point,4326),
+  created_at timestamp default now()
 );
 
-create table if not exists jobs (
+-- JOBS TABLE
+
+create table jobs (
   id uuid primary key default gen_random_uuid(),
-  customer_name text not null,
-  customer_phone text not null,
-  pickup_address text not null,
-  dropoff_address text not null,
-  pickup_lat numeric not null,
-  pickup_lng numeric not null,
-  dropoff_lat numeric not null,
-  dropoff_lng numeric not null,
-  parcel_type text not null,
-  priority text not null,
-  status text not null,
-  scheduled_pickup_at timestamp with time zone not null,
+
+  customer_name text,
+  customer_phone text,
+
+  pickup_address text,
+  dropoff_address text,
+
+  pickup_lat numeric,
+  pickup_lng numeric,
+
+  dropoff_lat numeric,
+  dropoff_lng numeric,
+
+  parcel_type text,
+
+  priority job_priority,
+  status job_status,
+
+  scheduled_pickup_at timestamp,
+
   driver_id uuid references drivers(id),
-  created_at timestamp with time zone not null default now(),
-  updated_at timestamp with time zone not null default now()
+
+  assigned_at timestamp,
+  started_at timestamp,
+  completed_at timestamp,
+  failed_at timestamp,
+
+  created_at timestamp default now(),
+  updated_at timestamp default now()
 );
-
-create index if not exists idx_jobs_driver_id on jobs(driver_id);
-create index if not exists idx_drivers_vehicle_id on drivers(vehicle_id);
-
-create or replace function set_jobs_updated_at()
-returns trigger
-language plpgsql
-as $$
-begin
-  new.updated_at = now();
-  return new;
-end;
-$$;
-
-drop trigger if exists jobs_set_updated_at on jobs;
-
-create trigger jobs_set_updated_at
-before update on jobs
-for each row
-execute function set_jobs_updated_at();

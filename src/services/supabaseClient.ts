@@ -9,14 +9,16 @@ export function getSupabaseClient() {
   }
 
   const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-  const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+  const supabasePublishableKey =
+    import.meta.env.VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY ??
+    import.meta.env.VITE_SUPABASE_ANON_KEY
 
-  if (!supabaseUrl || !supabaseAnonKey) {
+  if (!supabaseUrl || !supabasePublishableKey) {
     throw new Error("Supabase environment variables are missing")
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  supabaseClient = createClient<any>(supabaseUrl, supabaseAnonKey, {
+  supabaseClient = createClient<any>(supabaseUrl, supabasePublishableKey, {
     auth: {
       persistSession: false,
     },
