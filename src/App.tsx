@@ -1,7 +1,9 @@
-import { AppRouter } from './app/router'
-
 function App() {
-  return <AppRouter />
+  return (
+    <div className="flex min-h-screen items-center justify-center">
+      <h1 className="text-2xl font-semibold text-slate-100">DispatchLite</h1>
+    </div>
+  )
 }
 
 export default App
