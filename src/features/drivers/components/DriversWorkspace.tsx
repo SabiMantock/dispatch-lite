@@ -16,9 +16,16 @@ export function DriversWorkspace() {
   const [dialogOpen, setDialogOpen] = useState(false)
 
   const filteredDrivers = useMemo(() => {
-    if (!filters.status) return drivers
-    return drivers.filter((d) => d.status === filters.status)
-  }, [drivers, filters.status])
+    let result = drivers
+    if (filters.status) {
+      result = result.filter((d) => d.status === filters.status)
+    }
+    if (filters.search) {
+      const q = filters.search.toLowerCase()
+      result = result.filter((d) => d.name.toLowerCase().includes(q))
+    }
+    return result
+  }, [drivers, filters.status, filters.search])
 
   const openDetail = (driver: Driver) => {
     setSelectedDriver(driver)

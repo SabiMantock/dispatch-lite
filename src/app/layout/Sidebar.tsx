@@ -3,12 +3,20 @@ import { ChevronLeft, ChevronRight } from "lucide-react"
 import { ROUTES } from "./routes"
 import { useUIStore } from "@/stores/uiStore"
 import type { Workspace } from "@/stores/uiStore"
+import { useJobs } from "@/features/jobs/hooks/useJobs"
+import { jobsService } from "@/features/jobs/services/jobsServiceInstance"
 import { cn } from "@/lib/utils"
 
 export function Sidebar() {
   const collapsed = useUIStore((s) => s.sidebarCollapsed)
   const toggleSidebar = useUIStore((s) => s.toggleSidebar)
   const setActiveWorkspace = useUIStore((s) => s.setActiveWorkspace)
+
+  // Notification badge: high-priority pending + failed jobs
+  const { jobs } = useJobs(jobsService)
+  const urgentCount = jobs.filter(
+    (j) => (j.priority === "high" && j.status === "pending") || j.status === "failed",
+  ).length
 
   return (
     <aside
@@ -55,7 +63,16 @@ export function Sidebar() {
                     <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-primary" />
                   )}
                   <Icon className="h-4 w-4 shrink-0" />
-                  {!collapsed && <span>{route.label}</span>}
+                  {!collapsed && (
+                    <span className="flex flex-1 items-center justify-between">
+                      {route.label}
+                      {route.path === "/jobs" && urgentCount > 0 && (
+                        <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-[10px] font-semibold text-white">
+                          {urgentCount}
+                        </span>
+                      )}
+                    </span>
+                  )}
                 </>
               )}
             </NavLink>

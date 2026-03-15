@@ -1,8 +1,11 @@
+import { useState } from "react"
 import {
   flexRender,
   getCoreRowModel,
+  getSortedRowModel,
   useReactTable,
   type ColumnDef,
+  type SortingState,
 } from "@tanstack/react-table"
 import {
   Table,
@@ -14,7 +17,8 @@ import {
 } from "@/components/ui/table"
 import { EmptyState } from "./EmptyState"
 import type { LucideIcon } from "lucide-react"
-import { Package } from "lucide-react"
+import { ArrowDown, ArrowUp, ArrowUpDown, Package } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 interface DataTableProps<TData> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -22,6 +26,7 @@ interface DataTableProps<TData> {
   data: TData[]
   onRowClick?: (row: TData) => void
   isLoading?: boolean
+  initialSorting?: SortingState
   emptyIcon?: LucideIcon
   emptyTitle?: string
   emptyDescription?: string
@@ -32,14 +37,20 @@ export function DataTable<TData>({
   data,
   onRowClick,
   isLoading,
+  initialSorting = [],
   emptyIcon = Package,
   emptyTitle = "No data found",
   emptyDescription,
 }: DataTableProps<TData>) {
+  const [sorting, setSorting] = useState<SortingState>(initialSorting)
+
   const table = useReactTable({
     data,
     columns,
+    state: { sorting },
+    onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
   })
 
   if (isLoading) {
@@ -58,16 +69,37 @@ export function DataTable<TData>({
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id} className="hover:bg-transparent">
-              {headerGroup.headers.map((header) => (
-                <TableHead
-                  key={header.id}
-                  className="text-xs font-medium uppercase tracking-wider text-muted-foreground"
-                >
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(header.column.columnDef.header, header.getContext())}
-                </TableHead>
-              ))}
+              {headerGroup.headers.map((header) => {
+                const canSort = header.column.getCanSort()
+                const sorted = header.column.getIsSorted()
+                return (
+                  <TableHead
+                    key={header.id}
+                    className={cn(
+                      "text-xs font-medium uppercase tracking-wider text-muted-foreground",
+                      canSort && "cursor-pointer select-none",
+                    )}
+                    onClick={canSort ? header.column.getToggleSortingHandler() : undefined}
+                  >
+                    <div className="flex items-center gap-1">
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(header.column.columnDef.header, header.getContext())}
+                      {canSort && (
+                        <span className="text-muted-foreground/50">
+                          {sorted === "asc" ? (
+                            <ArrowUp className="h-3 w-3" />
+                          ) : sorted === "desc" ? (
+                            <ArrowDown className="h-3 w-3" />
+                          ) : (
+                            <ArrowUpDown className="h-3 w-3" />
+                          )}
+                        </span>
+                      )}
+                    </div>
+                  </TableHead>
+                )
+              })}
             </TableRow>
           ))}
         </TableHeader>

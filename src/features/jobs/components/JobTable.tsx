@@ -16,6 +16,12 @@ import { cn } from "@/lib/utils"
 
 const col = createColumnHelper<Job>()
 
+const PRIORITY_ORDER: Record<string, number> = { high: 3, medium: 2, low: 1 }
+
+const INITIAL_SORTING = [
+  { id: "priority", desc: true },
+]
+
 function truncate(str: string, len = 30) {
   return str.length > len ? str.slice(0, len) + "..." : str
 }
@@ -65,6 +71,8 @@ export function JobTable({ jobs, isLoading, onRowClick, onViewDetail }: JobTable
     col.accessor("priority", {
       header: "Priority",
       cell: (info) => <PriorityBadge priority={info.getValue()} />,
+      sortingFn: (a, b) =>
+        (PRIORITY_ORDER[a.original.priority] ?? 0) - (PRIORITY_ORDER[b.original.priority] ?? 0),
     }),
     col.accessor("status", {
       header: "Status",
@@ -108,6 +116,7 @@ export function JobTable({ jobs, isLoading, onRowClick, onViewDetail }: JobTable
       data={jobs}
       onRowClick={onRowClick}
       isLoading={isLoading}
+      initialSorting={INITIAL_SORTING}
       emptyIcon={Package}
       emptyTitle="No jobs found"
       emptyDescription="Try adjusting your filters"

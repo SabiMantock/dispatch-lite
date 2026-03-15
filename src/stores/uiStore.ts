@@ -28,7 +28,7 @@ interface UIState {
 }
 
 const initialFilters: FilterState = {
-  status: null,
+  status: "active",
   priority: null,
   search: "",
 }

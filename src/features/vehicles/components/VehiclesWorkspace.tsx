@@ -16,9 +16,16 @@ export function VehiclesWorkspace() {
   const [dialogOpen, setDialogOpen] = useState(false)
 
   const filteredVehicles = useMemo(() => {
-    if (!filters.status) return vehicles
-    return vehicles.filter((v) => v.status === filters.status)
-  }, [vehicles, filters.status])
+    let result = vehicles
+    if (filters.status) {
+      result = result.filter((v) => v.status === filters.status)
+    }
+    if (filters.search) {
+      const q = filters.search.toLowerCase()
+      result = result.filter((v) => v.plateNumber.toLowerCase().includes(q))
+    }
+    return result
+  }, [vehicles, filters.status, filters.search])
 
   const openDetail = (vehicle: Vehicle) => {
     setSelectedVehicle(vehicle)
